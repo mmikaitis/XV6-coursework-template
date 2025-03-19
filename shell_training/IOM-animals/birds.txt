@@ -1,0 +1,89 @@
+red-throated diver, gavia stellata
+black-throated diver, gavia arctica
+great northern diver, gavia immer
+little grebe, tachybaptus ruficollis
+slavonian grebe, podiceps auritus
+storm petrel, hydrobates pelagicus
+manx shearwater, puffinus puffinus
+fulmar, fulmarus glacialis
+gannet, morus bassanus
+cormorant, phalacrocorax carbo
+shag, phalacrocorax aristotelis
+bittern, botaurus stellaris
+grey heron, ardea cinerea
+mute swan, cygnus olor
+whooper swan, cygnus cygnus
+pink-footed goose, anser brachyrynchus
+greylag goose, anser anser
+canada goose, branta canadensis
+brent goose, branta bernicla
+shelduck, tadorna tadorna
+wigeon, anas penelope
+gadwall, anas strepera
+teal, anas crecca
+mallard, anus platyrhynchos
+shoveler, anas clypeata
+pochard, aythya ferina
+tufted duck, aythya fuligula
+scaup, aythya marila
+eider, somateria mollissima
+long-tailed duck, clangula hyemalis
+common scoter, melanitta nigra
+velvet scoter, melanitta fusca
+goldeneye, bucephala clangula
+red-breasted merganser, mergus serrator
+goosander, mergus merganser
+ruddy duck, oxyura jamaicensis
+sparrowhawk, accipiter nisus
+hen harrier, circus cyaneus
+white-tailed eagle, haliaeetus albicilla
+kestrel, falco tinnunculus
+merlin, falco columbarius
+peregrine, falco peregrinus
+red-legged partridge, alectoris rufa
+grey partridge, perdix perdix
+quail, coturnix coturnix
+black grouse, tetrao tetrix†
+red grouse, lagopus lagopus scoticus
+pheasant, phasianus colchicus
+water rail, rallus aquaticus
+corncrake, crex crex
+coot, fulica atra
+oystercatcher, haematopus ostralegus
+curlew, numenius arguata
+woodcock, scolopax rusticola
+snipe, gallinago gallinago
+herring gull, larsus argentatus
+great black-backed gull, larsus marinus
+puffin, fratercula arctica
+razorbill, alca torda
+woodpigeon, columba palumbus
+collared dove, streptopelia decaocto
+barn owl, tyto alba
+swallow, hirundo rustica
+grey wagtail, motacilla cinerea
+pied wagtail, motacilla alba yarrellii
+wren, troglodytes troglodytes
+dunnock, prunella modularis
+robin, erithacus rubecula
+blackbird, turdus merula
+song thrush, turdus philomelos
+willow warbler, phylloscopus trochilus
+goldcrest, regulus regulus
+blue tit, parus caeruleus
+great tit, parus major
+coal tit, parus ater
+long-tailed tit, aegithalos caudatus
+starling, sturnus vulgaris
+magpie, pica pica
+jackdaw, corvus monedula
+raven, corvus corax
+carrion crow, corvus corax
+hooded crow, corvus cornix
+chough, phyrocorrax phyrocorrax
+rook, corvus frugilegus
+house sparrow, passer domesticus
+common chaffinch, fringilla coelebs
+goldfinch, carduelis chloris
+greenfinch, carduelis chloris
+corn bunting, miliaria calandra
