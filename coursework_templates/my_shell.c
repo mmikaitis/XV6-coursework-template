@@ -2,7 +2,8 @@
 #include "user/user.h"
 #include "kernel/fcntl.h"
 
-/* Read a line of characters from stdin. */
+/* Print the prompt ">>> " and read a line of characters
+   from stdin. */
 int getcmd(char *buf, int nbuf) {
 
   // ##### Place your code here
@@ -20,18 +21,22 @@ void run_command(char *buf, int nbuf, int *pcp) {
   /* Useful data structures and flags. */
   char *arguments[10];
   int numargs = 0;
-  /* Word start/end */
+  /* Flags to mark word start/end */
   int ws = 1;
   int we = 0;
 
+  /* Flags to mark redirection direction */
   int redirection_left = 0;
   int redirection_right = 0;
+
+  /* File names supplied in the command */
   char *file_name_l = 0;
   char *file_name_r = 0;
 
   int p[2];
   int pipe_cmd = 0;
 
+  /* Flag to mark sequence command */
   int sequence_cmd = 0;
 
   int i = 0;
@@ -63,6 +68,7 @@ void run_command(char *buf, int nbuf, int *pcp) {
     if (fork() != 0) {
       wait(0);
       // ##### Place your code here.
+      // Call run_command recursively
     }
   }
 
@@ -94,6 +100,7 @@ void run_command(char *buf, int nbuf, int *pcp) {
       // ##### Place your code here.
     } else {
       // ##### Place your code here.
+      // Simple command; call exec()
     }
   }
   exit(0);
