@@ -29,26 +29,33 @@ void find(char *path, char *expression) {
     p = path;
     e = p + strlen(path);
     b = p;
-    // get path basename
+    // Move pointer p character by character until it is
+    // equivalent to e (end of the path). When '/' is met,
+    // save the pointer to b, so that at the end b contains
+    // the pointer to the last '/' in the path.
     while (p < e) {
-      if (*p++ == '/') {
-        b = p;
-      }
+      // PLACE YOUR CODE HERE
     }
 
-    if (strcmp(b, expression) == 0) {
-      fprintf(1, "%s\n", path);
-    }
+    // If the string at pointer b is equal to the string
+    // that we are searching for, print out the path.
+
+    // PLACE YOUR CODE HERE
     break;
   case T_DIR:
     strcpy(buf, path);
     p = buf + strlen(buf);
-    *p++ = '/';
+    // Add '/' at the end of this path.
+    // PLACE YOUR CODE HERE
+
+    // Read each item in the directory, add the name of the item
+    // to the end of the path in buf, and run find() recursively.
     while(read(fd, &de, sizeof(de)) == sizeof(de)) {
-      if (de.inum == 0 || strcmp(de.name, ".") == 0 || 
-          strcmp(de.name, "..") == 0) { // ??
-        continue;
-      }
+      // Skip if no items are found, of if '.' or '..' found
+      // PLACE YOUR CODE HERE
+
+      // Move the name of the item to the end of the path in buff
+      // and call find() with the new path.
       memmove(p, de.name, DIRSIZ);
       // Terminate the extended string.
       p[DIRSIZ] = '\0';
@@ -68,4 +75,3 @@ int main(int argc, char *argv[]) {
   find(argv[1], argv[2]);
   exit(0);
 }
-
