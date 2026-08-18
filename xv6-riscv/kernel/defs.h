@@ -1,3 +1,4 @@
+// clang-format off
 struct buf;
 struct context;
 struct file;
@@ -72,10 +73,10 @@ void            pipeclose(struct pipe*, int);
 int             piperead(struct pipe*, uint64, int);
 int             pipewrite(struct pipe*, uint64, int);
 
-// printf.c
-int             printf(char*, ...) __attribute__ ((format (printf, 1, 2)));
+// printk.c
+int             printk(char*, ...) __attribute__ ((format (printf, 1, 2)));
 void            panic(char*) __attribute__((noreturn));
-void            printfinit(void);
+void            printkinit(void);
 
 // proc.c
 int             cpuid(void);
@@ -89,12 +90,12 @@ int             kkill(int);
 int             killed(struct proc*);
 void            setkilled(struct proc*);
 struct cpu*     mycpu(void);
-struct cpu*     getmycpu(void);
 struct proc*    myproc();
 void            procinit(void);
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
-void            sleep(void*, struct spinlock*);
+void            sleep_prepare(void*);
+void            sleep(void);
 void            userinit(void);
 int             kwait(uint64);
 void            wakeup(void*);
@@ -149,7 +150,6 @@ void            uartinit(void);
 void            uartintr(void);
 void            uartwrite(char [], int);
 void            uartputc_sync(int);
-int             uartgetc(void);
 
 // vm.c
 void            kvminit(void);
@@ -165,11 +165,11 @@ void            uvmunmap(pagetable_t, uint64, uint64, int);
 void            uvmclear(pagetable_t, uint64);
 pte_t *         walk(pagetable_t, uint64, int);
 uint64          walkaddr(pagetable_t, uint64);
-int             copyout(pagetable_t, uint64, char *, uint64);
-int             copyin(pagetable_t, char *, uint64, uint64);
-int             copyinstr(pagetable_t, char *, uint64, uint64);
+int             copyout(pagetable_t, uint64, uint64, char *, uint64);
+int             copyin(pagetable_t, uint64, char *, uint64, uint64);
+int             copyinstr(pagetable_t, uint64, char *, uint64, uint64);
 int             ismapped(pagetable_t, uint64);
-uint64          vmfault(pagetable_t, uint64, int);
+uint64          vmfault(pagetable_t, uint64, uint64, int);
 
 // plic.c
 void            plicinit(void);
@@ -183,4 +183,4 @@ void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
 
 // number of elements in fixed-size array
-#define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+#define NELEM(x) (sizeof(x) / sizeof((x)[0]))

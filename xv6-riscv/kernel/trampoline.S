@@ -102,6 +102,10 @@ userret:
         # usertrap() returns here, with user satp in a0.
         # return from kernel to user.
 
+        # flush icache, in case this is the first time
+        # we're running this proc on this hart.
+        fence.i
+
         # switch to the user page table.
         sfence.vma zero, zero
         csrw satp, a0
@@ -145,5 +149,5 @@ userret:
         ld a0, 112(a0)
         
         # return to user mode and user pc.
-        # usertrapret() set up sstatus and sepc.
+        # prepare_return() sets up sstatus and sepc.
         sret

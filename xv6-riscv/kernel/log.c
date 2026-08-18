@@ -43,6 +43,7 @@ struct log {
   int outstanding; // how many FS sys calls are executing.
   int committing;  // in commit(), please wait.
   int dev;
+  int ncommit;
   struct logheader lh;
 };
 struct log log;
@@ -69,14 +70,14 @@ install_trans(int recovering)
   int tail;
 
   for (tail = 0; tail < log.lh.n; tail++) {
-    if(recovering) {
-      printf("recovering tail %d dst %d\n", tail, log.lh.block[tail]);
+    if (recovering) {
+      printk("recovering tail %d dst %d\n", tail, log.lh.block[tail]);
     }
-    struct buf *lbuf = bread(log.dev, log.start+tail+1); // read log block
-    struct buf *dbuf = bread(log.dev, log.lh.block[tail]); // read dst
-    memmove(dbuf->data, lbuf->data, BSIZE);  // copy block to dst
-    bwrite(dbuf);  // write dst to disk
-    if(recovering == 0)
+    struct buf *lbuf = bread(log.dev, log.start + tail + 1); // read log block
+    struct buf *dbuf = bread(log.dev, log.lh.block[tail]);   // read dst
+    memmove(dbuf->data, lbuf->data, BSIZE); // copy block to dst
+    bwrite(dbuf);                           // write dst to disk
+    if (recovering == 0)
       bunpin(dbuf);
     brelse(lbuf);
     brelse(dbuf);
@@ -88,7 +89,7 @@ static void
 read_head(void)
 {
   struct buf *buf = bread(log.dev, log.start);
-  struct logheader *lh = (struct logheader *) (buf->data);
+  struct logheader *lh = (struct logheader *)(buf->data);
   int i;
   log.lh.n = lh->n;
   for (i = 0; i < log.lh.n; i++) {
@@ -104,7 +105,7 @@ static void
 write_head(void)
 {
   struct buf *buf = bread(log.dev, log.start);
-  struct logheader *hb = (struct logheader *) (buf->data);
+  struct logheader *hb = (struct logheader *)(buf->data);
   int i;
   hb->n = log.lh.n;
   for (i = 0; i < log.lh.n; i++) {
@@ -128,12 +129,18 @@ void
 begin_op(void)
 {
   acquire(&log.lock);
-  while(1){
-    if(log.committing){
-      sleep(&log, &log.lock);
-    } else if(log.lh.n + (log.outstanding+1)*MAXOPBLOCKS > LOGBLOCKS){
+  while (1) {
+    if (log.committing) {
+      sleep_prepare(&log);
+      release(&log.lock);
+      sleep();
+      acquire(&log.lock);
+    } else if (log.lh.n + (log.outstanding + 1) * MAXOPBLOCKS > LOGBLOCKS) {
       // this op might exhaust log space; wait for commit.
-      sleep(&log, &log.lock);
+      sleep_prepare(&log);
+      release(&log.lock);
+      sleep();
+      acquire(&log.lock);
     } else {
       log.outstanding += 1;
       release(&log.lock);
@@ -151,9 +158,9 @@ end_op(void)
 
   acquire(&log.lock);
   log.outstanding -= 1;
-  if(log.committing)
+  if (log.committing)
     panic("log.committing");
-  if(log.outstanding == 0){
+  if (log.outstanding == 0) {
     do_commit = 1;
     log.committing = 1;
   } else {
@@ -164,12 +171,13 @@ end_op(void)
   }
   release(&log.lock);
 
-  if(do_commit){
+  if (do_commit) {
     // call commit w/o holding locks, since not allowed
     // to sleep with locks.
     commit();
     acquire(&log.lock);
     log.committing = 0;
+    log.ncommit += 1;
     wakeup(&log);
     release(&log.lock);
   }
@@ -182,10 +190,10 @@ write_log(void)
   int tail;
 
   for (tail = 0; tail < log.lh.n; tail++) {
-    struct buf *to = bread(log.dev, log.start+tail+1); // log block
+    struct buf *to = bread(log.dev, log.start + tail + 1); // log block
     struct buf *from = bread(log.dev, log.lh.block[tail]); // cache block
     memmove(to->data, from->data, BSIZE);
-    bwrite(to);  // write the log
+    bwrite(to); // write the log
     brelse(from);
     brelse(to);
   }
@@ -195,11 +203,11 @@ static void
 commit()
 {
   if (log.lh.n > 0) {
-    write_log();     // Write modified blocks from cache to log
-    write_head();    // Write header to disk -- the real commit
+    write_log();      // Write modified blocks from cache to log
+    write_head();     // Write header to disk -- the real commit
     install_trans(0); // Now install writes to home locations
     log.lh.n = 0;
-    write_head();    // Erase the transaction from the log
+    write_head(); // Erase the transaction from the log
   }
 }
 
@@ -224,14 +232,30 @@ log_write(struct buf *b)
     panic("log_write outside of trans");
 
   for (i = 0; i < log.lh.n; i++) {
-    if (log.lh.block[i] == b->blockno)   // log absorption
+    if (log.lh.block[i] == b->blockno) // log absorption
       break;
   }
   log.lh.block[i] = b->blockno;
-  if (i == log.lh.n) {  // Add new block to log?
+  if (i == log.lh.n) { // Add new block to log?
     bpin(b);
     log.lh.n++;
   }
   release(&log.lock);
 }
 
+uint64
+sys_sync(void)
+{
+  acquire(&log.lock);
+  if (log.committing || log.outstanding > 0) {
+    int n = log.ncommit + 1;
+    while (log.ncommit < n) {
+      sleep_prepare(&log);
+      release(&log.lock);
+      sleep();
+      acquire(&log.lock);
+    }
+  }
+  release(&log.lock);
+  return 0;
+}
